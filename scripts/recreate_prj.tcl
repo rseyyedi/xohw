@@ -23,6 +23,7 @@
 # 2. The following source(s) files that were local or imported into the original project.
 #    (Please see the '$orig_proj_dir' and '$origin_dir' variable setting below at the start of the script)
 #
+#    <none>
 #
 # 3. The following remote source files that were added to the original project:-
 #
@@ -99,7 +100,7 @@ if { $::argc > 0 } {
 }
 
 # Set the directory path for the original project from where this script was exported
-set orig_proj_dir "[file normalize "$origin_dir/../"]"
+set orig_proj_dir "[file normalize "$origin_dir/../work"]"
 
 # Create project
 create_project ${_xil_proj_name_} "work" -part xc7z010clg400-1
@@ -121,6 +122,7 @@ set_property -name "dsa.flash_offset_address" -value "0" -objects $obj
 set_property -name "dsa.flash_size" -value "1024" -objects $obj
 set_property -name "dsa.host_architecture" -value "x86_64" -objects $obj
 set_property -name "dsa.host_interface" -value "pcie" -objects $obj
+set_property -name "dsa.num_compute_units" -value "60" -objects $obj
 set_property -name "dsa.platform_state" -value "pre_synth" -objects $obj
 set_property -name "dsa.vendor" -value "xilinx" -objects $obj
 set_property -name "dsa.version" -value "0.0" -objects $obj
@@ -164,12 +166,6 @@ set files [list \
 ]
 add_files -norecurse -fileset $obj $files
 
-# Add local files from the original project (-no_copy_sources specified)
-set files [list \
- [file normalize "${origin_dir}/../archive_project_summary.txt" ]\
-]
-set added_files [add_files -fileset sources_1 $files]
-
 # Set 'sources_1' fileset file properties for remote files
 set file "$origin_dir/../bd/design_1/design_1.bd"
 set file [file normalize $file]
@@ -184,14 +180,6 @@ set_property -name "scoped_to_ref" -value "design_1" -objects $file_obj
 set_property -name "used_in" -value "implementation" -objects $file_obj
 set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
-set file "$origin_dir/../sdk/imus/Debug/imus.elf"
-set file [file normalize $file]
-set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
-set_property -name "scoped_to_cells" -value "IMUs/microblaze_1" -objects $file_obj
-set_property -name "scoped_to_ref" -value "design_1" -objects $file_obj
-set_property -name "used_in" -value "implementation" -objects $file_obj
-set_property -name "used_in_simulation" -value "0" -objects $file_obj
-
 set file "$origin_dir/../sdk/bu/Debug/bu.elf"
 set file [file normalize $file]
 set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
@@ -200,11 +188,23 @@ set_property -name "scoped_to_ref" -value "design_1" -objects $file_obj
 set_property -name "used_in" -value "implementation" -objects $file_obj
 set_property -name "used_in_simulation" -value "0" -objects $file_obj
 
+set file "$origin_dir/../sdk/imus/Debug/imus.elf"
+set file [file normalize $file]
+set file_obj [get_files -of_objects [get_filesets sources_1] [list "*$file"]]
+set_property -name "scoped_to_cells" -value "IMUs/microblaze_1" -objects $file_obj
+set_property -name "scoped_to_ref" -value "design_1" -objects $file_obj
+set_property -name "used_in" -value "implementation" -objects $file_obj
+set_property -name "used_in_simulation" -value "0" -objects $file_obj
+
+
 make_wrapper -files [get_files *${_xil_proj_name_}.bd] -top -import
+# Set 'sources_1' fileset file properties for local files
+# None
 
 # Set 'sources_1' fileset properties
 set obj [get_filesets sources_1]
 set_property -name "top" -value "design_1_wrapper" -objects $obj
+set_property -name "top_auto_set" -value "0" -objects $obj
 
 # Create 'constrs_1' fileset (if not found)
 if {[string equal [get_filesets -quiet constrs_1] ""]} {
@@ -215,7 +215,7 @@ if {[string equal [get_filesets -quiet constrs_1] ""]} {
 set obj [get_filesets constrs_1]
 
 # Add/Import constrs file and set constrs file properties
-set file "[file normalize ${origin_dir}/../xdc/constraints.xdc]"
+set file "[file normalize "$origin_dir/../xdc/constraints.xdc"]"
 set file_added [add_files -norecurse -fileset $obj [list $file]]
 set file "$origin_dir/../xdc/constraints.xdc"
 set file [file normalize $file]
@@ -224,9 +224,9 @@ set_property -name "file_type" -value "XDC" -objects $file_obj
 
 # Set 'constrs_1' fileset properties
 set obj [get_filesets constrs_1]
-set_property -name "target_constrs_file" -value "$orig_proj_dir/xdc/constraints.xdc" -objects $obj
+set_property -name "target_constrs_file" -value "[file normalize "$origin_dir/../xdc/constraints.xdc"]" -objects $obj
 set_property -name "target_part" -value "xc7z010clg400-1" -objects $obj
-set_property -name "target_ucf" -value "$orig_proj_dir/xdc/constraints.xdc" -objects $obj
+set_property -name "target_ucf" -value "[file normalize "$origin_dir/../xdc/constraints.xdc"]" -objects $obj
 
 # Create 'sim_1' fileset (if not found)
 if {[string equal [get_filesets -quiet sim_1] ""]} {
@@ -270,7 +270,6 @@ set_property -name "display_name" -value "synth_1_synth_report_utilization_0" -o
 
 }
 set obj [get_runs synth_1]
-set_property -name "needs_refresh" -value "1" -objects $obj
 set_property -name "part" -value "xc7z010clg400-1" -objects $obj
 set_property -name "strategy" -value "Vivado Synthesis Defaults" -objects $obj
 
@@ -495,7 +494,6 @@ set_property -name "display_name" -value "impl_1_post_route_phys_opt_report_bus_
 
 }
 set obj [get_runs impl_1]
-set_property -name "needs_refresh" -value "1" -objects $obj
 set_property -name "part" -value "xc7z010clg400-1" -objects $obj
 set_property -name "strategy" -value "Vivado Implementation Defaults" -objects $obj
 set_property -name "steps.write_bitstream.args.readback_file" -value "0" -objects $obj
