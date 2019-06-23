@@ -1,0 +1,33 @@
+WORKFLOW_OPERATION simulation,dialog;
+
+DEFINE_MEMORY_TYPE flight_controller_flight_controller_local_memory_lmb_bram_128K_1_MEM_DEVICE [0x00020000] 32;
+DEFINE_MEMORY_TYPE blk_mem_gen_sa_fc_4K_2_MEM_DEVICE [0x00001000] 32;
+DEFINE_MEMORY_TYPE sensor_actor_sensor_actor_local_memory_lmb_bram_128K_1_MEM_DEVICE [0x00020000] 32;
+DEFINE_MEMORY_TYPE blk_mem_gen_sa_fc_4K_3_MEM_DEVICE [0x00001000] 32;
+
+ADDRESS_MAP flight_controller_flight_controller_mb MICROBLAZE-LE 100 flight_controller/flight_controller_mb
+   ADDRESS_SPACE flight_controller_flight_controller_local_memory_lmb_bram_128K_1_ADDR_SPACE flight_controller_flight_controller_local_memory_lmb_bram_128K_1_MEM_DEVICE  [0x00000000:0x0001FFFF] flight_controller/flight_controller_local_memory/dlmb_bram_if_cntlr
+     BUS_BLOCK
+      flight_controller_flight_controller_local_memory_lmb_bram_128K_1_BUS_BLK [31:0] INPUT = "design_1_lmb_bram_0.mem";
+     END_BUS_BLOCK;
+   END_ADDRESS_SPACE;
+   ADDRESS_SPACE blk_mem_gen_sa_fc_4K_2_ADDR_SPACE blk_mem_gen_sa_fc_4K_2_MEM_DEVICE  [0x40000000:0x40000FFF] flight_controller/axi_bram_ctrl_fc_to_sa
+     BUS_BLOCK
+      blk_mem_gen_sa_fc_4K_2_BUS_BLK [31:0] INPUT = "design_1_blk_mem_gen_sa_fc_0.mem";
+     END_BUS_BLOCK;
+   END_ADDRESS_SPACE;
+END_ADDRESS_MAP;
+
+ADDRESS_MAP sensor_actor_sensor_actor_mb MICROBLAZE-LE 100 sensor_actor/sensor_actor_mb
+   ADDRESS_SPACE sensor_actor_sensor_actor_local_memory_lmb_bram_128K_1_ADDR_SPACE sensor_actor_sensor_actor_local_memory_lmb_bram_128K_1_MEM_DEVICE  [0x00000000:0x0001FFFF] sensor_actor/sensor_actor_local_memory/dlmb_bram_if_cntlr
+     BUS_BLOCK
+      sensor_actor_sensor_actor_local_memory_lmb_bram_128K_1_BUS_BLK [31:0] INPUT = "design_1_lmb_bram_1.mem";
+     END_BUS_BLOCK;
+   END_ADDRESS_SPACE;
+   ADDRESS_SPACE blk_mem_gen_sa_fc_4K_3_ADDR_SPACE blk_mem_gen_sa_fc_4K_3_MEM_DEVICE  [0xC0000000:0xC0000FFF] sensor_actor/axi_bram_ctrl_sa
+     BUS_BLOCK
+      blk_mem_gen_sa_fc_4K_3_BUS_BLK [31:0] INPUT = "design_1_blk_mem_gen_sa_fc_0.mem";
+     END_BUS_BLOCK;
+   END_ADDRESS_SPACE;
+END_ADDRESS_MAP;
+

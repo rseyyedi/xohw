@@ -1,0 +1,4 @@
+THIRPARTY=false
+HW_PROJECT_REFERENCE=pgaa_wrapper_hw_platform_0
+PROCESSOR=sensor_actor_sensor_actor_mb
+MSS_FILE=system.mss
